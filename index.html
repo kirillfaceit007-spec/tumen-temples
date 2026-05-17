@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Четыре святыни Тюмени: прогулка и поездка</title>
+    <link href="https://cdn.jsdelivr.net/npm/fontsource-roboto@4.0.0/index.css" rel="stylesheet">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=9ad07a56-058b-4966-8841-b7ea1e0ee64f&lang=ru_RU" type="text/javascript"></script>
+    <style>
+        :root {
+            --color-terracotta: #C0603E;
+            --color-terracotta-dark: #A04E30;
+            --color-terracotta-light: #D4845F;
+            --color-gold: #C9A84C;
+            --color-gold-light: #E0C97A;
+            --color-gold-dark: #A8883A;
+            --color-bg: #FAF7F2;
+            --color-bg-card: #FFFFFF;
+            --color-text: #2C2C2C;
+            --color-text-light: #6B6B6B;
+            --color-border: #E8E0D6;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 12px 40px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --color-timeline-bg: #fff;
+        }
+        body.dark-mode {
+            --color-terracotta: #D4845F;
+            --color-terracotta-dark: #C0603E;
+            --color-terracotta-light: #E0A98A;
+            --color-gold: #C9A84C;
+            --color-gold-light: #E0C97A;
+            --color-gold-dark: #A8883A;
+            --color-bg: #1E1E1E;
+            --color-bg-card: #2C2C2C;
+            --color-text: #EAEAEA;
+            --color-text-light: #BBBBBB;
+            --color-border: #444444;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.6);
+            --shadow-xl: 0 12px 40px rgba(0,0,0,0.7);
+            --color-timeline-bg: #2C2C2C;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(250, 247, 242, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-border);
+            transition: var(--transition);
+        }
+        body.dark-mode .navbar { background: rgba(30, 30, 30, 0.92); }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .navbar-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
+        }
+        .navbar-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 16px; color: var(--color-terracotta); text-decoration: none;
+        }
+        .navbar-controls { display: flex; align-items: center; gap: 12px; }
+        .navbar-tabs { display: flex; gap: 4px; background: var(--color-border); border-radius: 50px; padding: 4px; }
+        .navbar-tab {
+            padding: 8px 20px; border-radius: 50px; border: none; background: transparent;
+            font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 500;
+            color: var(--color-text-light); cursor: pointer; transition: var(--transition);
+        }
+        .navbar-tab:hover { color: var(--color-terracotta); background: rgba(192,96,62,0.08); }
+        .navbar-tab.active { background: var(--color-terracotta); color: #fff; box-shadow: var(--shadow-sm); }
+        .theme-toggle {
+            background: none; border: 1px solid var(--color-border); border-radius: 50%;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: var(--color-text-light); transition: var(--transition);
+        }
+        .theme-toggle:hover { background: var(--color-border); color: var(--color-terracotta); }
+        .navbar-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; color: var(--color-terracotta); }
+        .mobile-menu {
+            display: none; position: fixed; top: 64px; left: 0; right: 0;
+            background: rgba(250,247,242,0.98); backdrop-filter: blur(16px);
+            padding: 16px; border-bottom: 1px solid var(--color-border); box-shadow: var(--shadow-lg); z-index: 999;
+        }
+        body.dark-mode .mobile-menu { background: rgba(30,30,30,0.98); }
+        .mobile-menu.open { display: flex; flex-direction: column; gap: 4px; }
+        .mobile-menu .navbar-tab { width: 100%; text-align: center; padding: 12px; border-radius: var(--radius-sm); }
+        .mobile-menu .navbar-tab.active { background: var(--color-terracotta); color: #fff; }
+
+        .main-content { margin-top: 64px; }
+        .tab-section { display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .tab-section.active { display: block; }
+        .tab-section.visible { opacity: 1; transform: translateY(0); }
+
+        .hero {
+            position: relative; min-height: 70vh; display: flex; align-items: center; justify-content: center;
+            text-align: center; padding: 60px 24px;
+            background: linear-gradient(160deg, var(--color-terracotta) 0%, var(--color-terracotta-dark) 50%, #6B3A2A 100%);
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 800px; }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 16px; }
+        .hero h1 span { color: var(--color-gold-light); }
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem); color: rgba(255,255,255,0.85);
+            font-weight: 300; max-width: 600px; margin: 0 auto 32px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+            padding: 10px 24px; border-radius: 50px; color: #fff; font-size: 14px;
+            font-weight: 500; border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .hero-badge:hover {
+            background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 0 20px rgba(201,168,76,0.4); transform: translateY(-2px);
+        }
+
+        .temples-section { max-width: 900px; margin: 0 auto; padding: 60px 24px 80px; }
+        .section-header { text-align: center; margin-bottom: 48px; }
+        .section-header h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; }
+        .section-header p { color: var(--color-text-light); max-width: 550px; margin: 0 auto; }
+        .section-divider {
+            width: 60px; height: 4px;
+            background: linear-gradient(90deg, var(--color-terracotta), var(--color-gold));
+            border-radius: 2px; margin: 16px auto 0;
+        }
+
+        .temple-card {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+            background: var(--color-bg-card); border-radius: var(--radius-lg); overflow: hidden;
+            box-shadow: var(--shadow-md); margin-bottom: 40px; opacity: 0; transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+        }
+        .temple-card.animate-in { opacity: 1; transform: translateY(0); }
+        .temple-card:hover { box-shadow: var(--shadow-xl); transform: translateY(-4px); }
+        .temple-card.animate-in:hover { transform: translateY(-4px); }
+        .temple-card:nth-child(even) .temple-card-image { order: 2; }
+        .temple-card:nth-child(even) .temple-card-content { order: 1; }
+
+        .temple-card-image { position: relative; min-height: 300px; overflow: hidden; }
+        .temple-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .temple-card:hover .temple-card-image img { transform: scale(1.05); }
+        .image-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%); }
+        .image-caption { position: absolute; bottom: 12px; left: 12px; color: #fff; font-size: 12px; opacity: 0.8; }
+        .temple-card-content { padding: 32px; display: flex; flex-direction: column; justify-content: center; }
+        .temple-confession { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-terracotta); margin-bottom: 8px; }
+        .temple-name { font-size: clamp(1.1rem, 2.5vw, 1.35rem); font-weight: 700; margin-bottom: 12px; }
+        .temple-year {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+            color: #fff; padding: 4px 14px; border-radius: 50px; font-size: 13px; font-weight: 600;
+            margin-bottom: 8px; width: fit-content;
+        }
+        .temple-address { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--color-text-light); margin-bottom: 16px; }
+        .temple-fact { background: rgba(192,96,62,0.06); border-left: 3px solid var(--color-terracotta); padding: 12px 16px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 16px; }
+        .temple-fact-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-terracotta); margin-bottom: 4px; }
+        .temple-description { font-size: 14px; color: var(--color-text-light); }
+        .temple-note {
+            margin-top: 12px; padding: 8px 12px; background: rgba(201,168,76,0.15);
+            border-radius: var(--radius-sm); font-size: 13px; color: var(--color-gold-dark);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .temple-number {
+            position: absolute; top: 16px; left: 16px; width: 36px; height: 36px; border-radius: 50%;
+            background: var(--color-terracotta); color: #fff; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; z-index: 2; box-shadow: var(--shadow-md);
+        }
+
+        .btn-route {
+            background: var(--color-terracotta); color: #fff; padding: 14px 36px; font-size: 16px;
+            font-weight: 600; border: none; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: inline-flex; align-items: center; gap: 8px; font-family: 'Roboto', sans-serif;
+        }
+        .btn-route:hover { background: var(--color-terracotta-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+        .map-section { padding: 24px; max-width: 1200px; margin: 0 auto; }
+        .map-container {
+            position: relative; width: 100%; height: 500px; border-radius: var(--radius-lg);
+            overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--color-border); background: #E8E0D6;
+        }
+        #yandex-map { width: 100%; height: 100%; }
+        .map-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--color-bg); z-index: 10; }
+        .map-loading.hidden { display: none; }
+        .map-spinner {
+            width: 40px; height: 40px; border: 3px solid var(--color-border);
+            border-top-color: var(--color-terracotta); border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .route-info { margin-top: 32px; background: var(--color-bg-card); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); border: 1px solid var(--color-border); }
+        .route-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .route-stat {
+            background: linear-gradient(135deg, rgba(192,96,62,0.06), rgba(201,168,76,0.06));
+            border-radius: var(--radius-md); padding: 20px; text-align: center; border: 1px solid var(--color-border);
+        }
+        .route-stat-value { font-size: 1.5rem; font-weight: 800; color: var(--color-terracotta); }
+        .route-text { color: var(--color-text-light); margin-bottom: 16px; }
+        .route-steps { list-style: none; margin-bottom: 24px; }
+        .route-steps li { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--color-border); }
+        .route-step-number { width: 28px; height: 28px; border-radius: 50%; background: var(--color-terracotta); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+        .route-extra { background: rgba(201,168,76,0.08); border-radius: var(--radius-md); padding: 16px; border-left: 4px solid var(--color-gold); }
+
+        .about-section { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+        .about-hero-card {
+            background: linear-gradient(135deg, var(--color-terracotta), var(--color-terracotta-dark));
+            border-radius: var(--radius-lg); padding: 40px; color: #fff; margin-bottom: 40px;
+        }
+        .about-content-block {
+            background: var(--color-bg-card); border-radius: var(--radius-lg); padding: 32px;
+            margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+            opacity: 0; transform: translateY(30px); transition: all 0.6s ease;
+        }
+        .about-content-block.animate-in { opacity: 1; transform: translateY(0); }
+
+        .timeline {
+            margin-bottom: 40px; background: var(--color-bg-card); border-radius: var(--radius-lg);
+            padding: 32px; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+            opacity: 0; transform: translateY(30px); transition: all 0.6s ease;
+        }
+        .timeline.animate-in { opacity: 1; transform: translateY(0); }
+        .timeline h3 { text-align: center; font-size: 1.2rem; font-weight: 700; margin-bottom: 24px; color: var(--color-terracotta); }
+        .timeline-track { display: flex; justify-content: space-between; position: relative; padding: 0 20px; }
+        .timeline-track::before {
+            content: ''; position: absolute; top: 24px; left: 60px; right: 60px;
+            height: 2px; background: var(--color-terracotta); z-index: 0;
+        }
+        .timeline-item {
+            display: flex; flex-direction: column; align-items: center; z-index: 1;
+            background: var(--color-timeline-bg); padding: 8px 12px; border-radius: 12px; min-width: 70px;
+        }
+        .timeline-year { font-weight: 700; font-size: 14px; color: var(--color-terracotta); margin-bottom: 4px; }
+        .timeline-event { font-size: 12px; color: var(--color-text-light); text-align: center; line-height: 1.4; max-width: 120px; }
+
+        .site-footer { text-align: center; padding: 32px; background: var(--color-text); color: rgba(255,255,255,0.5); }
+        .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
+        .fade-up.animate-in { opacity: 1; transform: translateY(0); }
+
+        /* Лайтбокс */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .temple-detail {
+            background: var(--color-bg-card); border-radius: var(--radius-lg); padding: 32px; margin-bottom: 32px;
+            box-shadow: var(--shadow-md); border: 1px solid var(--color-border); scroll-margin-top: 80px;
+        }
+        .temple-detail h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; color: var(--color-terracotta); margin-bottom: 16px; }
+        .temple-detail .lead { font-size: 1.05rem; color: var(--color-text); margin-bottom: 16px; }
+        .temple-detail p { margin-bottom: 16px; font-size: 0.95rem; line-height: 1.7; color: var(--color-text-light); }
+        .temple-detail .fact-box {
+            background: rgba(192,96,62,0.05); border-left: 4px solid var(--color-terracotta);
+            padding: 16px; border-radius: 0 var(--radius-md) var(--radius-md) 0; margin: 20px 0;
+        }
+        .extra-photos { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+        .extra-photos img {
+            flex: 1; min-width: 200px; height: 200px; object-fit: cover; border-radius: var(--radius-md);
+            border: 1px solid var(--color-border); background: var(--color-border);
+            cursor: pointer; transition: transform 0.3s ease;
+        }
+        .extra-photos img:hover { transform: scale(1.02); }
+
+        @media (max-width: 768px) {
+            .navbar-tabs { display: none; }
+            .navbar-hamburger { display: block; }
+            .temple-card { grid-template-columns: 1fr; }
+            .temple-card:nth-child(even) .temple-card-image { order: 0; }
+            .temple-card:nth-child(even) .temple-card-content { order: 0; }
+            .temple-card-image { min-height: 220px; }
+            .map-container { height: 350px; }
+            .route-stats { grid-template-columns: 1fr 1fr; }
+            .timeline-track { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .timeline-track::before { display: none; }
+            .timeline-item { flex-direction: row; gap: 12px; min-width: auto; }
+            .extra-photos img { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="#" class="navbar-logo" onclick="switchTab('home'); return false;">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="13" stroke="#C0603E" stroke-width="2"/>
+                    <path d="M8 18 C8 12, 11 7, 14 7 C17 7, 20 12, 20 18" stroke="#C0603E" stroke-width="2" fill="none"/>
+                    <line x1="14" y1="7" x2="14" y2="4" stroke="#C0603E" stroke-width="2"/>
+                    <circle cx="14" cy="3" r="1.5" fill="#C9A84C"/>
+                </svg>
+                <span>Душа города</span>
+            </a>
+            <div class="navbar-controls">
+                <div class="navbar-tabs">
+                    <button class="navbar-tab active" data-tab="home" onclick="switchTab('home')">Главная</button>
+                    <button class="navbar-tab" data-tab="route" onclick="switchTab('route')">Маршрут</button>
+                    <button class="navbar-tab" data-tab="history" onclick="switchTab('history')">История</button>
+                    <button class="navbar-tab" data-tab="details" onclick="switchTab('details')">Храмы</button>
+                    <button class="navbar-tab" data-tab="about" onclick="switchTab('about')">О проекте</button>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Переключить тему">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <button class="navbar-hamburger" onclick="toggleMobileMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <button class="navbar-tab active" data-tab="home" onclick="switchTab('home')">Главная</button>
+            <button class="navbar-tab" data-tab="route" onclick="switchTab('route')">Маршрут</button>
+            <button class="navbar-tab" data-tab="history" onclick="switchTab('history')">История</button>
+            <button class="navbar-tab" data-tab="details" onclick="switchTab('details')">Храмы</button>
+            <button class="navbar-tab" data-tab="about" onclick="switchTab('about')">О проекте</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Главная -->
+        <div class="tab-section active" id="tab-home">
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="hero-icon">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="30" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                            <path d="M16 40 C16 28, 22 16, 32 16 C42 16, 48 28, 48 40" stroke="#E0C97A" stroke-width="3" fill="none"/>
+                            <line x1="32" y1="16" x2="32" y2="8" stroke="#E0C97A" stroke-width="3"/>
+                            <circle cx="32" cy="5" r="3" fill="#E0C97A"/>
+                        </svg>
+                    </div>
+                    <h1>Четыре святыни Тюмени:<br><span>прогулка и поездка</span></h1>
+                    <p class="hero-subtitle">
+                        Пройдите по историческому центру от монастыря до синагоги (2,2 км), и дополните путешествие визитом в Соборную мечеть.
+                    </p>
+                    <div class="hero-badge" onclick="switchTab('route')" title="Открыть карту маршрута">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        3 храма пешком + 1 поездка
+                    </div>
+                </div>
+            </section>
+
+            <section class="temples-section">
+                <div class="section-header fade-up">
+                    <h2>Четыре храма — четыре религии</h2>
+                    <p>Маршрут начинается у Свято-Троицкого монастыря и завершается у мечети</p>
+                    <div class="section-divider"></div>
+                </div>
+
+                <!-- 1. Свято-Троицкий монастырь -->
+                <article class="temple-card" data-delay="0" onclick="goToDetail('monastyr')">
+                    <div class="temple-card-image">
+                        <span class="temple-number">1</span>
+                        <img src="images/monastyr.png" alt="Свято-Троицкий монастырь" loading="lazy">
+                        <div class="image-overlay"></div>
+                        <span class="image-caption">Свято-Троицкий монастырь — ул. Коммунистическая, 10</span>
+                    </div>
+                    <div class="temple-card-content">
+                        <span class="temple-confession">Православие</span>
+                        <h3 class="temple-name">Свято-Троицкий мужской монастырь</h3>
+                        <span class="temple-year">1616 год</span>
+                        <div class="temple-address">ул. Коммунистическая, 10</div>
+                        <div class="temple-fact">
+                            <div class="temple-fact-label">Архитектурная особенность</div>
+                            <div class="temple-fact-text">Старейшее каменное здание Сибири; образец раннего сибирского барокко</div>
+                        </div>
+                        <p class="temple-description">Свято-Троицкий монастырь — духовный центр Сибири, основанный в самом начале освоения этих земель. Его белые стены и золотые купола стали визитной карточкой Тюмени.</p>
+                    </div>
+                </article>
+
+                <!-- 2. Костёл -->
+                <article class="temple-card" data-delay="150" onclick="goToDetail('kostel')">
+                    <div class="temple-card-image">
+                        <span class="temple-number">2</span>
+                        <img src="images/kostel.png" alt="Костёл Святого Иосифа" loading="lazy">
+                        <div class="image-overlay"></div>
+                        <span class="image-caption">Костёл Святого Иосифа — ул. Ленина, 7</span>
+                    </div>
+                    <div class="temple-card-content">
+                        <span class="temple-confession">Католицизм</span>
+                        <h3 class="temple-name">Римско-католический костёл Святого Иосифа Обручника</h3>
+                        <span class="temple-year">1906 год</span>
+                        <div class="temple-address">ул. Ленина, 7</div>
+                        <div class="temple-fact">
+                            <div class="temple-fact-label">Архитектурная особенность</div>
+                            <div class="temple-fact-text">Неоготическая архитектура с высокими стрельчатыми окнами и кирпичными сводами, напоминающая средневековые европейские храмы</div>
+                        </div>
+                        <p class="temple-description">Католический костёл — уникальное явление для Сибири. Построенный польскими архитекторами, он перенёс дух средневековой Европы в сердце Тюмени.</p>
+                    </div>
+                </article>
+
+                <!-- 3. Синагога -->
+                <article class="temple-card" data-delay="300" onclick="goToDetail('sinagoga')">
+                    <div class="temple-card-image">
+                        <span class="temple-number">3</span>
+                        <img src="images/sinagoga.png" alt="Синагога Мадрегот" loading="lazy">
+                        <div class="image-overlay"></div>
+                        <span class="image-caption">Синагога «Мадрегот» — ул. Кирова, 44</span>
+                    </div>
+                    <div class="temple-card-content">
+                        <span class="temple-confession">Иудаизм</span>
+                        <h3 class="temple-name">Синагога «Мадрегот»</h3>
+                        <span class="temple-year">1912 год</span>
+                        <div class="temple-address">ул. Кирова, 44</div>
+                        <div class="temple-fact">
+                            <div class="temple-fact-label">Архитектурная особенность</div>
+                            <div class="temple-fact-text">Эклектичное здание с мавританскими элементами, памятник архитектуры регионального значения</div>
+                        </div>
+                        <p class="temple-description">Синагога «Мадрегот» — живое свидетельство многонационального характера Тюмени. Еврейская община города возвела это величественное здание, ставшее символом культурного разнообразия.</p>
+                    </div>
+                </article>
+
+                <!-- 4. Мечеть -->
+                <article class="temple-card" data-delay="450" onclick="goToDetail('mechet')">
+                    <div class="temple-card-image">
+                        <span class="temple-number">4</span>
+                        <img src="images/mechet.png" alt="Соборная мечеть" loading="lazy">
+                        <div class="image-overlay"></div>
+                        <span class="image-caption">Соборная мечеть — мкр. Парфёново, ул. Жданова, 9</span>
+                    </div>
+                    <div class="temple-card-content">
+                        <span class="temple-confession">Ислам</span>
+                        <h3 class="temple-name">Соборная мечеть имени Умара ибн аль-Хаттаба</h3>
+                        <span class="temple-year">1997 год</span>
+                        <div class="temple-address">ул. Жданова, 9</div>
+                        <div class="temple-fact">
+                            <div class="temple-fact-label">Архитектурная особенность</div>
+                            <div class="temple-fact-text">Современная мечеть с четырьмя минаретами и большим голубым куполом, крупнейшая в регионе</div>
+                        </div>
+                        <p class="temple-description">Соборная мечеть — яркое завершение маршрута, символизирующее живую мусульманскую общину Тюмени. Величественный голубой купол и четыре минарета делают её одной из самых узнаваемых достопримечательностей города.</p>
+                        <div class="temple-note">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Находится в 7 км от центра. Рекомендуем доехать на автобусе или такси.
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Блок "Как вести себя при посещении храмов" -->
+                <div class="about-content-block fade-up">
+                    <h3>Как вести себя при посещении храмов</h3>
+                    <p>Маршрут объединяет святыни разных религий и культур. Просим относиться к каждому объекту с уважением и соблюдать базовые правила посещения.</p>
+                    <p><strong>В православном монастыре:</strong> рекомендуется спокойное и уважительное поведение; во время службы не следует громко разговаривать; женщинам желательно иметь платок.</p>
+                    <p><strong>В католическом костёле:</strong> следует соблюдать тишину; не рекомендуется использовать вспышку при съёмке; во время концертов и служб необходимо отключать звук телефона.</p>
+                    <p><strong>В синагоге:</strong> посещение желательно согласовывать заранее; необходимо уважительно относиться к религиозным предметам и традициям общины.</p>
+                    <p><strong>В мечети:</strong> рекомендуется закрытая одежда; обувь снимается перед входом в молельный зал; во время намаза не следует мешать молящимся.</p>
+                    <p><strong>Главное правило:</strong> каждый храм — это не только архитектурный объект, но и действующее священное пространство для верующих людей.</p>
+                </div>
+
+                <div class="route-cta fade-up" style="text-align:center; margin-top: 20px;">
+                    <p style="font-size: 1.2rem; color: var(--color-text-light); margin-bottom: 16px;">Готовы отправиться в путь?</p>
+                    <button class="btn-route" onclick="switchTab('route')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Открыть маршрут
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Маршрут -->
+        <div class="tab-section" id="tab-route">
+            <section class="map-section">
+                <div class="section-header fade-up">
+                    <h2>Карта маршрута</h2>
+                    <p>Пешеходная красная линия объединяет три центральных храма. Синяя — путь от мечети к центру.</p>
+                    <div class="section-divider"></div>
+                </div>
+                <div class="map-container">
+                    <div class="map-loading" id="mapLoading"><div class="map-spinner"></div><span class="map-loading-text">Загрузка карты...</span></div>
+                    <div id="yandex-map"></div>
+                </div>
+                <div class="route-info fade-up">
+                    <div class="route-info-header"><h3>Описание маршрута</h3></div>
+                    <div class="route-stats">
+                        <div class="route-stat"><div class="route-stat-value">2,2 км</div><div>пешком</div></div>
+                        <div class="route-stat"><div class="route-stat-value">~30 мин</div><div>прогулка</div></div>
+                        <div class="route-stat"><div class="route-stat-value">3</div><div>храма в центре</div></div>
+                        <div class="route-stat"><div class="route-stat-value">+1</div><div>поездка к мечети</div></div>
+                    </div>
+                    <p class="route-text">Пешеходная часть начинается у Свято-Троицкого монастыря и заканчивается у Синагоги «Мадрегот».</p>
+                    <ul class="route-steps">
+                        <li><span class="route-step-number">1</span><span><strong>Свято-Троицкий монастырь</strong> — ул. Коммунистическая, 10</span></li>
+                        <li><span class="route-step-number">2</span><span><strong>Костёл Святого Иосифа</strong> — ул. Ленина, 7</span></li>
+                        <li><span class="route-step-number">3</span><span><strong>Синагога «Мадрегот»</strong> — ул. Кирова, 44</span></li>
+                        <li><span class="route-step-number">4</span><span><strong>Соборная мечеть</strong> — ул. Жданова, 9</span></li>
+                    </ul>
+                    <div class="route-extra">
+                        <p style="font-weight:700; margin-bottom:8px;">➕ Продолжение маршрута</p>
+                        <p>После посещения Синагоги «Мадрегот» у вас есть несколько вариантов добраться до следующей локации:</p>
+                        <ol style="margin: 10px 0 10px 20px; color: var(--color-text-light); line-height: 1.6;">
+                            <li><strong>Автобус №37:</strong> выйдите на улицу Ленина и пройдите до остановки «Дворец творчества и спорта». Садитесь на автобус №37 и езжайте до остановки «Автоколонна 1228». Перейдите дорогу и по улице Дружбы через 10 минут дойдёте до Соборной мечети. <br><em>Стоимость: 42 рубля наличными, 37 рублей по карте.</em></li>
+                            <li><strong>Такси:</strong> вы можете вызвать такси прямо от синагоги. <br><em>Стоимость: 200–400 рублей.</em></li>
+                        </ol>
+                        <p style="font-weight:700; margin-top: 20px; margin-bottom:8px;">💡 Чем заняться в дороге</p>
+                        <ul style="list-style: none; padding-left: 0; color: var(--color-text-light);">
+                            
+                            </li>
+                            <li style="margin-bottom: 12px; padding-left: 20px; position: relative;">
+                                <span style="position: absolute; left: 0;">📝</span>
+                                <strong>Заметки путешественника</strong><br>
+                                Откройте заметки в телефоне и запишите впечатления от трёх уже посещённых храмов. Что запомнилось? Какие детали поразили?
+                            </li>
+                            <li style="margin-bottom: 12px; padding-left: 20px; position: relative;">
+                                <span style="position: absolute; left: 0;">🏛️</span>
+                                <strong>Архитектурная наблюдалка</strong><br>
+                                Посмотрите в окно и попробуйте найти здания с элементами разных стилей — сколько стилей попадётся?
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Блок "Практическая информация" теперь внутри tab-route -->
+                <div class="about-content-block fade-up" style="margin-top: 32px;">
+                    <h3>Практическая информация для туриста</h3>
+                    <p>Перед посещением объектов маршрута рекомендуем уточнять расписание служб и режим работы храмов на официальных ресурсах.</p>
+                    <p><strong>Полезно знать:</strong></p>
+                    <ul style="margin: 10px 0 10px 20px; color: var(--color-text-light);">
+                        <li>Вход во все объекты маршрута бесплатный.</li>
+                        <li>Во время богослужений рекомендуется соблюдать тишину.</li>
+                        <li>Фото- и видеосъёмка внутри храмов может быть ограничена.</li>
+                        <li>В некоторых объектах необходимо соблюдать требования к внешнему виду.</li>
+                    </ul>
+                    <p><strong>Примерное время посещения:</strong></p>
+                    <ul style="margin: 10px 0 10px 20px; color: var(--color-text-light);">
+                        <li>Свято-Троицкий монастырь — ежедневно с 08:00 до 19:00.</li>
+                        <li>Костёл Святого Иосифа — во время служб и мероприятий.</li>
+                        <li>Синагога «Мадрегот» — по согласованию с общиной.</li>
+                        <li>Соборная мечеть — ежедневно, вне времени молитв.</li>
+                    </ul>
+                    <p><strong>Рекомендуем:</strong> иметь удобную обувь для прогулки; взять воду в тёплое время года; учитывать погодные условия Сибири.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- История -->
+        <div class="tab-section" id="tab-history">
+            <section class="about-section">
+                <div class="timeline fade-up" id="timelineBlock">
+                    <h3>История многоконфессиональной Тюмени</h3>
+                    <div class="timeline-track">
+                        <div class="timeline-item"><div class="timeline-year">1616</div><div class="timeline-event">Основание Свято-Троицкого монастыря — оплота православия в Сибири</div></div>
+                        <div class="timeline-item"><div class="timeline-year">1860</div><div class="timeline-event">Появление католической общины из ссыльных поляков</div></div>
+                        <div class="timeline-item"><div class="timeline-year">1912</div><div class="timeline-event">Постройка синагоги «Мадрегот» еврейской общиной</div></div>
+                        <div class="timeline-item"><div class="timeline-year">1997</div><div class="timeline-event">Открытие Соборной мечети — крупнейшей в регионе</div></div>
+                    </div>
+                </div>
+                <div class="about-content-block" data-delay="0"><h3>Православие — основа</h3><p>Первые русские поселенцы, казаки и крестьяне, несли с собой православную веру. В 1616 году был основан Свято-Троицкий монастырь, ставший не просто первым каменным храмом, а мощным духовным и культурным центром освоения Сибири.</p></div>
+                <div class="about-content-block" data-delay="150"><h3>Ислам — коренное население</h3><p>Задолго до прихода русских эти земли населяли сибирские татары, исповедовавшие ислам. Они были неотъемлемой частью региона, и строительство мечетей было естественным продолжением их многовекового присутствия. Тюмень всегда была городом, где встречались две цивилизации — православная и мусульманская.</p></div>
+                <div class="about-content-block" data-delay="300"><h3>Католицизм — ссыльные поляки</h3><p>После подавления польского восстания 1863 года в Сибирь, в том числе в Тюмень, были сосланы тысячи поляков-католиков. Именно их усилиями и на их средства в начале XX века был построен католический костёл Святого Иосифа.</p></div>
+                <div class="about-content-block" data-delay="450"><h3>Иудаизм — еврейская община</h3><p>В это же время в Тюмень, также часто в результате ссылки, прибывало еврейское население. Община росла, и в 1911-1912 годах на её средства была заложена и построена синагога, которая сейчас является памятником архитектуры.</p></div>
+            </section>
+        </div>
+
+        <!-- Детали храмов -->
+        <div class="tab-section" id="tab-details">
+            <section class="about-section">
+                <!-- Монастырь -->
+                <div class="temple-detail" id="detail-monastyr">
+                    <h2>Троицкий монастырь — каменное сердце Сибири</h2>
+                    <p class="lead">Представьте: 1616 год. Вокруг суровый край, бескрайняя тайга и река Тура. А здесь, на высоком мысу, закладывают первый в Сибири каменный храм. Не деревянную церковь, а настоящую белокаменную твердыню. Её строили с верой, которая согревала в самые лютые морозы.</p>
+                    <p>Монастырь сразу стал центром притяжения купцов, путешественников, миссионеров — все останавливались здесь. Его стены помнят, как мимо проходили первые караваны, как звонили колокола, возвещая о победах и бедах. До революции в монастырской ризнице хранилось Евангелие весом в два пуда — более 32 килограмм!</p>
+                    <p>В советское время монастырь был закрыт, он пережил репрессии духовенства, разрушение и перепланировку, но не смотря на это всё он выдержал. Сегодня его золотые купола снова сияют над Турой, а внутри можно увидеть старинные фрески и почувствовать ту самую первозданную тишину.</p>
+                    <div class="fact-box">
+                        <strong>Архитектурная изюминка:</strong> Обратите внимание на наличники окон трапезной — это редкий образец «сибирского барокко», стиля, который родился именно здесь. Это самобытный архитектурный стиль XVIII века, характерный для храмового зодчества Сибири, сочетающий московское барокко, украинские традиции и элементы восточного декора. Ключевые черты: вертикализм колоколен, многоярусные венчания, богатство и изысканность каменных наличников. Постройки этого стиля появились в Тобольске и Тюмени благодаря деятельности митрополита Филофея Лещинского.
+                    </div>
+                    <div class="extra-photos">
+                        <img src="images/monastyr-interior.png" alt="Интерьер Свято-Троицкого монастыря" loading="lazy" onclick="openLightbox(this.src)">
+                        <img src="images/monastyr-detail.png" alt="Деталь Свято-Троицкого монастыря" loading="lazy" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- Костёл -->
+                <div class="temple-detail" id="detail-kostel">
+                    <h2>Костёл Святого Иосифа — уголок Европы в Сибири</h2>
+                    <p class="lead">В начале XX века по улицам Тюмени можно было пройти и вдруг услышать звуки органа. Это было настолько неожиданно для Сибири, что горожане специально приходили к костёлу, чтобы послушать. Католический храм построили ссыльные поляки после восстания 1863 года — они принесли с собой не только веру, но и архитектуру, напоминавшую им родину.</p>
+                    <p>Костёл выполнен в неоготическом стиле: высокие стрельчатые окна, кирпичные своды, острые шпили. Внутри до сих пор царит особая атмосфера полумрак и витражи, а скамьи, как в старых европейских церквях. В советские годы здание использовалось под склад, но потом его вернули верующим.</p>
+                    <p>Сегодня здесь снова звучит орган — единственный действующий орган в католических храмах Тюмени. Если повезёт, вы можете попасть на концерт и услышать, как музыка наполняет это строгое, но удивительно красивое пространство.</p>
+                    <div class="fact-box">
+                        <strong>Архитектурная изюминка:</strong> Обратите внимание на кирпичную кладку — она выполнена без штукатурки, что подчёркивает фактуру и роднит костёл с европейской средневековой архитектурой. Его уникальность в сочетании скромного, строгого декора с элементами готики: стрельчатыми арками, узкими окнами и башней‑звонницей.
+                    </div>
+                    <div class="extra-photos">
+                        <img src="images/kostel-interior.png" alt="Интерьер костёла" loading="lazy" onclick="openLightbox(this.src)">
+                        <img src="images/kostel-detail.png" alt="Деталь костёла" loading="lazy" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- Синагога -->
+                <div class="temple-detail" id="detail-sinagoga">
+                    <h2>Синагога «Мадрегот» — восточная сказка в Тюмени</h2>
+                    <p class="lead">Вы когда-нибудь видели здание, которое сочетает мавританские арки и классический сибирский кирпич? Синагога «Мадрегот» именно такая. Её построили в 1912 году на средства еврейской общины, которая появилась в Тюмени благодаря ссыльным и переселенцам. В городе, где большинство храмов были православными, этот нарядный, почти восточный дом сразу привлёк внимание.</p>
+                    <p>Фасад украшен изящными арками и узорами, а внутри сохранился старинный ковчег для свитков Торы. В советское время синагогу закрыли, но здание уцелело и сейчас является памятником архитектуры регионального значения. Сегодня здесь снова проходят службы, и можно услышать молитвы на иврите.</p>
+                    <p>Особый шарм синагоге придаёт контраст: представьте себе морозную тюменскую зиму и этот тёплый, словно из восточной сказки, фасад. Это живое свидетельство того, насколько разным может быть культурное наследие одного города.</p>
+                    <div class="fact-box">
+                        <strong>Архитектурная изюминка:</strong> Мавританские мотивы — редкость для Сибири. Обратите внимание на подковообразные арки и изящные карнизы, напоминающие архитектуру Средней Азии.
+                    </div>
+                    <div class="extra-photos">
+                        <img src="images/sinagoga-interior.png" alt="Интерьер синагоги" loading="lazy" onclick="openLightbox(this.src)">
+                        <img src="images/sinagoga-detail.png" alt="Деталь синагоги" loading="lazy" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+
+                <!-- Мечеть -->
+                <div class="temple-detail" id="detail-mechet">
+                    <h2>Соборная мечеть — голубой купол над Тюменью</h2>
+                    <p class="lead">Когда вы подходите к Соборной мечети, её четыре минарета видны издалека. Это самая большая мечеть региона, открытая в 1997 году, но её история уходит гораздо глубже — в те времена, когда сибирские татары жили на этой земле задолго до прихода русских.</p>
+                    <p>Мечеть построена в современном стиле, но при этом воплощает многовековые традиции исламской архитектуры: огромный голубой купол, изящные минареты, светлые стены. Внутри просторный молельный зал, где могут одновременно находиться более тысячи верующих. Сюда приезжают не только мусульмане, но и туристы, чтобы полюбоваться зданием и узнать больше об исламской культуре.</p>
+                    <p>Мечеть символизирует живую, развивающуюся общину, которая бережно хранит свои корни. В ней можно ощутить, как многогранна Тюмень и как гармонично в ней соседствуют разные религии.</p>
+                    <div class="fact-box">
+                        <strong>Архитектурная изюминка:</strong> Обратите внимание на арабскую вязь на стенах и изящные орнаменты — они выполнены мастерами, владеющими традиционной техникой резьбы по штукатурке.
+                    </div>
+                    <div class="extra-photos">
+                        <img src="images/mechet-interior.png" alt="Интерьер мечети" loading="lazy" onclick="openLightbox(this.src)">
+                        <img src="images/mechet-detail.png" alt="Деталь мечети" loading="lazy" onclick="openLightbox(this.src)">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- О проекте -->
+        <div class="tab-section" id="tab-about">
+            <section class="about-section">
+                <div class="about-hero-card fade-up"><h2>Почему именно эти четыре храма?</h2><p>Тюмень — город с удивительной конфессиональной палитрой (около 19 религиозных конфессий). Наш маршрут объединяет ключевые объекты четырёх мировых религий, даже если один из них требует отдельной поездки.</p></div>
+                <div class="about-content-block" data-delay="0"><h3>Три шага по центру</h3><p>Синагога, православный монастырь и католический костёл находятся в комфортной пешей доступности друг от друга. Вы без труда обойдёте их за полчаса, наслаждаясь архитектурой сибирского барокко, неоготики и мавританского стиля.</p></div>
+                <div class="about-content-block" data-delay="150"><h3>Одна поездка к мечети</h3><p>Соборная мечеть имени Умара ибн аль-Хаттаба расположена в 7 км от исторического ядра. Мы сознательно включили её в проект, потому что без неё картина многоконфессиональной Тюмени была бы неполной. Это крупнейшая мечеть региона, и она заслуживает отдельного визита.</p></div>
+                <div class="about-content-block" data-delay="300"><h3>Архитектурный калейдоскоп</h3><p>Каждый храм представляет уникальный стиль: от раннего сибирского барокко до современной исламской архитектуры. Маршрут позволяет увидеть, как разные культуры осваивали и преображали сибирское пространство на протяжении 380 лет.</p></div>
+                <!-- Блок "Источники информации" -->
+                <div class="about-content-block fade-up">
+                    <h3>Источники информации</h3>
+                    <p>При создании проекта использовались официальные сайты религиозных организаций, туристические порталы, научные и историко-краеведческие материалы, посвящённые архитектуре и культурному наследию Тюмени.</p>
+                    <p><strong>Основные источники:</strong></p>
+                    <ul style="margin: 10px 0 10px 20px; color: var(--color-text-light);">
+                        <li>Visit Tyumen — <a href="https://troica-tyumen.cerkov.ru/" target="_blank" style="color: var(--color-terracotta);">troica-tyumen.cerkov.ru</a></li>
+                        <li>Свято‑Троицкий монастырь — <a href="https://troica-tyumen.cerkov.ru/" target="_blank" style="color: var(--color-terracotta);">troica-tyumen.cerkov.ru</a></li>
+                        <li>Тюменская соборная мечеть — <a href="https://gorod-t.info/space/religioznye-obekty/1398/" target="_blank" style="color: var(--color-terracotta);">gorod-t.info</a></li>
+                        <li>Синагога «Мадрегот» — <a href="https://www.tourister.ru/world/europe/russia/city/tyumen/temples/28045" target="_blank" style="color: var(--color-terracotta);">tourister.ru</a></li>
+                        <li>Римско‑католический костёл Святого Иосифа — <a href="https://geocaching.su/cache/15602" target="_blank" style="color: var(--color-terracotta);">geocaching.su</a></li>
+                        <li>Объекты культурного наследия Тюменской области — <a href="https://okn.admtyumen.ru/" target="_blank" style="color: var(--color-terracotta);">okn.admtyumen.ru</a></li>
+                        <li>Культура.РФ — Сибирское барокко — <a href="https://www.culture.ru/materials/255257/sibirskoe-barokko" target="_blank" style="color: var(--color-terracotta);">culture.ru</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 «Четыре святыни Тюмени: прогулка и поездка»</p>
+    </footer>
+
+    <script>
+        const templesData = [
+            { name: 'Свято-Троицкий монастырь', year: 1616, address: 'ул. Коммунистическая, 10', coords: [57.169921280794874, 65.51288291534266], image: 'images/monastyr.png', color: '#C9A84C', isPedestrian: true, detailId: 'monastyr' },
+            { name: 'Костёл Святого Иосифа', year: 1906, address: 'ул. Ленина, 7', coords: [57.160078, 65.523602], image: 'images/kostel.png', color: '#A04E30', isPedestrian: true, detailId: 'kostel' },
+            { name: 'Синагога «Мадрегот»', year: 1912, address: 'ул. Кирова, 44', coords: [57.156285981559606, 65.52910572023706], image: 'images/sinagoga.png', color: '#C0603E', isPedestrian: true, detailId: 'sinagoga' },
+            { name: 'Соборная мечеть', year: 1997, address: 'ул. Жданова, 9', coords: [57.188104, 65.550066], image: 'images/mechet.png', color: '#D4845F', isPedestrian: false, detailId: 'mechet' }
+        ];
+
+        const pedestrianLineCoords = [[57.16919029470812, 65.51359128106543], [57.16681228373125, 65.51554392922827], [57.16382789580276, 65.51964234460297], [57.16106478983323, 65.52483510125573], [57.15998047643365, 65.52294682610928], [57.15649996453825, 65.52979718793326]];
+        const walkToStopLine = [[57.15643050440049, 65.5297036051699], [57.155779692549274, 65.53095016180956]];
+        const busRouteLine = [[57.1853144535537, 65.55950898229496], [57.18493577995266, 65.55860776006597], [57.18434882820139, 65.557711902255], [57.18091140402354, 65.55264789163488], [57.17832438497569, 65.5477770000639], [57.17449596239511, 65.54015952646174], [57.173919042276886, 65.53909737169184], [57.17271272555046, 65.53868967592163], [57.17218239990488, 65.53879696428231], [57.16719346814526, 65.54012733995367], [57.15997697154945, 65.54196197091987], [57.1590850123217, 65.54139334260871], [57.15745261270581, 65.54139334260871], [57.15677048143783, 65.54132896959236], [57.15630988994946, 65.54088908731399], [57.15356954298859, 65.53546029626786], [57.1547181813668, 65.53325552045769], [57.15585949593814, 65.5310641556926]];
+        const walkToMosqueLine = [[57.18530321132817, 65.55952058530208], [57.18480802183005, 65.55874274468775], [57.18457790209326, 65.55841551518793], [57.18447886277628, 65.55807755685207], [57.18466821264198, 65.557655877289], [57.18474686112847, 65.55773634355944], [57.184901244705735, 65.5573340122072], [57.18520127131486, 65.55583733957688], [57.18558285501405, 65.55324096125047], [57.18577510179496, 65.552253908333], [57.186168330718694, 65.55075187128465], [57.18641591712907, 65.55000085276045], [57.186794575499505, 65.54943222444929], [57.18698099049672, 65.54921764772809], [57.1880040715856, 65.55038038533603]];
+        const stops = [
+            { coords: [57.15578965580809, 65.5309594402199], name: 'остановка: «дворец творчества и спорта»' },
+            { coords: [57.185308752385275, 65.55951155518329], name: 'остановка: «Aвтоколонна 1228»' }
+        ];
+
+        let currentTab = 'home';
+        let mapInitialized = false;
+        let yandexMap = null;
+
+        function switchTab(tabName) {
+            const cur = document.getElementById('tab-' + currentTab);
+            if (cur) { cur.classList.remove('visible'); setTimeout(() => cur.classList.remove('active'), 300); }
+            const next = document.getElementById('tab-' + tabName);
+            if (next) { next.classList.add('active'); requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('visible'))); }
+            document.querySelectorAll('.navbar-tab').forEach(t => { t.classList.remove('active'); if (t.dataset.tab === tabName) t.classList.add('active'); });
+            closeMobileMenu();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentTab = tabName;
+
+            if (tabName === 'route' && !mapInitialized) initMap();
+            if (tabName === 'home') { setTimeout(animateTempleCards, 300); setTimeout(animateFadeUps, 300); }
+            if (tabName === 'about') { setTimeout(animateAboutBlocks, 200); }
+            if (tabName === 'history') { setTimeout(animateAboutBlocks, 200); setTimeout(animateFadeUps, 200); }
+            if (tabName === 'details') { setTimeout(animateFadeUps, 200); }
+        }
+
+        function goToDetail(slug) {
+            switchTab('details');
+            setTimeout(() => {
+                const el = document.getElementById('detail-' + slug);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 400);
+        }
+
+        function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+        function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); }
+        window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10); });
+
+        function animateTempleCards() {
+            document.querySelectorAll('.temple-card').forEach(card => {
+                if (card.classList.contains('animate-in')) return;
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if (entry.isIntersecting) { const delay = parseInt(entry.target.dataset.delay) || 0; setTimeout(() => entry.target.classList.add('animate-in'), delay); observer.unobserve(entry.target); } });
+                }, { threshold: 0.15 });
+                observer.observe(card);
+            });
+        }
+
+        function animateFadeUps() {
+            document.querySelectorAll('.fade-up').forEach(el => {
+                if (el.classList.contains('animate-in')) return;
+                const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate-in'); observer.unobserve(entry.target); } }); }, { threshold: 0.1 });
+                observer.observe(el);
+            });
+        }
+
+        function animateAboutBlocks() {
+            document.querySelectorAll('.about-content-block').forEach(block => {
+                if (block.classList.contains('animate-in')) return;
+                const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate-in'); observer.unobserve(entry.target); } }); }, { threshold: 0.1 });
+                observer.observe(block);
+            });
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('darkMode');
+            if (saved === 'true') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').textContent = '🌙'; }
+            else { document.getElementById('themeIcon').textContent = '☀️'; }
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('darkMode', isDark);
+        });
+
+        function openLightbox(src) {
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            lightbox.onclick = () => document.body.removeChild(lightbox);
+            const img = document.createElement('img');
+            img.src = src;
+            lightbox.appendChild(img);
+            document.body.appendChild(lightbox);
+        }
+
+        function initMap() {
+            if (typeof ymaps === 'undefined') { document.getElementById('mapLoading').innerHTML = 'Ошибка загрузки API Яндекс.Карт. Проверьте ключ.'; return; }
+            ymaps.ready(() => {
+                yandexMap = new ymaps.Map('yandex-map', { center: [57.163, 65.53], zoom: 13, controls: ['zoomControl', 'fullscreenControl'] }, { suppressMapOpenBlock: true });
+                document.getElementById('mapLoading').classList.add('hidden');
+
+                templesData.forEach((temple, index) => {
+                    const balloonContent = `<div style="max-width:220px;padding:8px;"><img src="${temple.image}" alt="${temple.name}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;"><h4 style="font-size:14px;font-weight:700;margin-bottom:4px;">${temple.name}</h4><p style="font-size:13px;color:#6B6B6B;">Адрес: <strong>${temple.address}</strong></p>${!temple.isPedestrian ? '<p style="font-size:12px;color:#C9A84C;">📍 За пределами пешего маршрута</p>' : ''}</div>`;
+                    const placemark = new ymaps.Placemark(temple.coords, { balloonContent, hintContent: temple.name }, { iconLayout: 'default#image', iconImageHref: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48"><path d="M18 0C8.06 0 0 8.06 0 18c0 12.6 18 30 18 30s18-17.4 18-30C36 8.06 27.94 0 18 0z" fill="${temple.color}"/><circle cx="18" cy="16" r="7" fill="white" opacity="0.9"/><text x="18" y="19" text-anchor="middle" font-size="10" font-weight="bold" fill="${temple.color}">${index+1}</text></svg>`), iconImageSize: [36, 48], iconImageOffset: [-18, -48] });
+                    yandexMap.geoObjects.add(placemark);
+                });
+
+                stops.forEach(stop => {
+                    const stopPlacemark = new ymaps.Placemark(stop.coords, { hintContent: stop.name, balloonContent: stop.name }, { iconLayout: 'default#image', iconImageHref: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#ed4543" stroke="white" stroke-width="2"/><text x="14" y="18" text-anchor="middle" font-size="10" font-weight="bold" fill="white">A</text></svg>`), iconImageSize: [28, 28], iconImageOffset: [-14, -14] });
+                    yandexMap.geoObjects.add(stopPlacemark);
+                });
+
+                const pedestrianLine = new ymaps.Polyline(pedestrianLineCoords, {}, { strokeColor: '#ed4543', strokeWidth: 5, strokeOpacity: 1 }); yandexMap.geoObjects.add(pedestrianLine);
+                const walkStopLine = new ymaps.Polyline(walkToStopLine, {}, { strokeColor: '#595959', strokeWidth: 4, strokeOpacity: 0.9 }); yandexMap.geoObjects.add(walkStopLine);
+                const busLine = new ymaps.Polyline(busRouteLine, {}, { strokeColor: '#b51eff', strokeWidth: 4, strokeOpacity: 0.8 }); yandexMap.geoObjects.add(busLine);
+                const walkMosqueLine = new ymaps.Polyline(walkToMosqueLine, {}, { strokeColor: '#595959', strokeWidth: 4, strokeOpacity: 0.9 }); yandexMap.geoObjects.add(walkMosqueLine);
+
+                setTimeout(() => { if (yandexMap.geoObjects.getBounds()) { yandexMap.setBounds(yandexMap.geoObjects.getBounds(), { checkZoomRange: true, zoomMargin: 60 }); } }, 500);
+            });
+            mapInitialized = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            const home = document.getElementById('tab-home');
+            if (home) { home.classList.add('active'); requestAnimationFrame(() => requestAnimationFrame(() => home.classList.add('visible'))); }
+            setTimeout(animateTempleCards, 500);
+            setTimeout(animateFadeUps, 500);
+        });
+    </script>
+</body>
+</html>
